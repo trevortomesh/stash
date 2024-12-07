@@ -4,18 +4,22 @@ import os
 import json
 import shutil
 from datetime import datetime, timedelta
+import mimetypes
 import argparse
 
 
 class DirectoryStash:
     STASH_DIR = ".stash"
     STASH_FILE = "stash.json"
+    RULES_FILE = "rules.json"
 
     def __init__(self, directory=None):
         self.directory = os.path.abspath(directory or os.getcwd())
         self.stash_dir = os.path.join(self.directory, self.STASH_DIR)
         self.stash_file = os.path.join(self.stash_dir, self.STASH_FILE)
+        self.rules_file = os.path.join(self.stash_dir, self.RULES_FILE)
         self.stash_data = self._load_stash()
+        self.rules = self._load_rules()
 
     def initialize(self):
         if os.path.exists(self.stash_file):
@@ -35,6 +39,7 @@ class DirectoryStash:
 
         os.makedirs(self.stash_dir, exist_ok=True)
         self._save_stash()
+        self._save_rules()
         print("Stash initialized successfully.")
 
     def update(self):
@@ -47,37 +52,34 @@ class DirectoryStash:
             print("Error: No external drive configured for deep stash.")
             return
 
+        root_files = [f for f in os.listdir(self.directory)
+                      if os.path.isfile(os.path.join(self.directory, f)) and not f.startswith('.')]
+
         deepstashed_count = 0
         soon_to_be_stashed = 0
 
-        for root, _, files in os.walk(self.directory):
-            for file in files:
-                if file.endswith(".ds") or root.startswith(self.stash_dir):
-                    continue  # Skip ghost files and internal .stash files
+        for file in root_files:
+            file_path = os.path.join(self.directory, file)
 
-                file_path = os.path.join(root, file)
+            if not os.path.exists(file_path):
+                print(f"Skipping missing file: {file_path}")
+                continue
 
-                # Ensure the file still exists before proceeding
-                if not os.path.exists(file_path):
-                    print(f"Skipping missing file: {file_path}")
-                    continue
+            sorted_path = self._sort_file(file_path)
+            if sorted_path != file_path:
+                file_path = sorted_path
 
-                try:
-                    last_modified = datetime.fromtimestamp(os.path.getmtime(file_path))
-                except FileNotFoundError:
-                    print(f"File not found, skipping: {file_path}")
-                    continue
+            last_modified = datetime.fromtimestamp(os.path.getmtime(file_path))
+            days_since_modified = (now - last_modified).days
 
-                days_since_modified = (now - last_modified).days
-
-                # Handle deepstashing
-                if days_since_modified >= deepstash_days:
-                    self._move_to_deepstash(file_path, external_drive)
-                    deepstashed_count += 1
-                elif days_since_modified >= (deepstash_days - 5):
-                    soon_to_be_stashed += 1
+            if days_since_modified >= deepstash_days:
+                self._move_to_deepstash(file_path, external_drive)
+                deepstashed_count += 1
+            elif days_since_modified >= (deepstash_days - 5):
+                soon_to_be_stashed += 1
 
         self._save_stash()
+        self._save_rules()
         print(f"Update complete. Files deep-stashed: {deepstashed_count}")
         print(f"Files soon to be deep-stashed: {soon_to_be_stashed}")
 
@@ -140,17 +142,47 @@ class DirectoryStash:
                     os.remove(ghost_file_path)
                     print(f"Restored '{original_path}'")
 
+    def _sort_file(self, file_path):
+        extension = os.path.splitext(file_path)[1][1:].lower()
+        mime_type, _ = mimetypes.guess_type(file_path)
+        target_folder = None
+
+        if extension in self.rules.get("extensions", {}):
+            target_folder = self.rules["extensions"][extension]
+        elif mime_type in self.rules.get("mime_types", {}):
+            target_folder = self.rules["mime_types"][mime_type]
+        else:
+            print(f"No rule exists for '{os.path.basename(file_path)}' (extension: .{extension})")
+            target_folder = input("Enter folder to sort this file into (or press Enter to skip): ").strip()
+            if target_folder:
+                self.rules["extensions"][extension] = target_folder
+                print(f"New rule saved: .{extension} -> {target_folder}")
+            else:
+                print("Skipping file.")
+                return file_path
+
+        target_dir = os.path.join(self.directory, target_folder)
+        os.makedirs(target_dir, exist_ok=True)
+        new_path = os.path.join(target_dir, os.path.basename(file_path))
+        shutil.move(file_path, new_path)
+        return new_path
+
     def _move_to_deepstash(self, file_path, external_drive):
         deepstash_dir = os.path.join(external_drive, "deepstash")
         os.makedirs(deepstash_dir, exist_ok=True)
         deepstash_path = os.path.join(deepstash_dir, os.path.basename(file_path))
         shutil.copy2(file_path, deepstash_path)
         os.remove(file_path)
-
         ghost_file_path = f"{file_path}.ds"
         with open(ghost_file_path, "w") as ghost_file:
             json.dump({"deep_stash_path": deepstash_path, "original_path": file_path}, ghost_file)
-        print(f"Deep-stashed '{file_path}' -> '{deepstash_path}'")
+
+    def _load_rules(self):
+        return json.load(open(self.rules_file, "r")) if os.path.exists(self.rules_file) else {"extensions": {}, "mime_types": {}}
+
+    def _save_rules(self):
+        with open(self.rules_file, "w") as file:
+            json.dump(self.rules, file, indent=4)
 
     def _load_stash(self):
         return json.load(open(self.stash_file, "r")) if os.path.exists(self.stash_file) else {"items": []}
@@ -167,10 +199,11 @@ def main():
     subparsers.add_parser("init", help="Initialize the stash.")
     subparsers.add_parser("update", help="Update the stash.")
     subparsers.add_parser("status", help="Show stash status.")
+
     deepstash_parser = subparsers.add_parser("deepstash", help="Force deepstash files.")
     deepstash_parser.add_argument("files", nargs="+", help="Files to deepstash.")
 
-    restore_parser = subparsers.add_parser("restore", help="Restore files.")
+    restore_parser = subparsers.add_parser("restore", help="Restore deep-stashed files.")
     restore_parser.add_argument("--timeframe", type=int, help="Restore files within N days.")
     restore_parser.add_argument("--folder", type=str, help="Restore files from a folder.")
     restore_parser.add_argument("--file", type=str, help="Restore a specific file.")
