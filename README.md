@@ -31,16 +31,20 @@ cd stash
 ```
 Alternatively, download the standalone script (stash) and place it in a directory of your choice.
 
-Step 2: Make Stash Executable
-   1. Make the script executable:
-```bash
-chmod +x stash
-```
+Step 2: Run the Install Script
 
-   2. Move the script to a directory in your system path, such as /usr/local/bin:
+The provided install.sh script will:
+	1.	Add the necessary shebang to stash.py.
+	2.	Rename it to stash.
+	3.	Make it executable.
+	4.	Move it to /usr/local/bin/ so it can be used globally as a command.
+
+To install, run:
 ```bash
-sudo mv stash /usr/local/bin/
+chmod +x install.sh
+./install.sh
 ```
+You’ll see confirmation messages, and stash will be installed successfully.
 
    3. Verify the installation by running:
 ```bash
