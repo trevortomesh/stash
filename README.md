@@ -46,6 +46,7 @@ sudo mv stash /usr/local/bin/
 ```bash
 stash --help
 ```
+---
 Usage
 
 1. Initialize a Stash
@@ -74,7 +75,7 @@ Where should .txt files be sorted? (Enter folder name or press Enter to skip):
 
 
    •  Newly defined rules are saved persistently for future use.
-
+---
 Example Workflow
 
 Step 1: Create a Stash
@@ -108,6 +109,7 @@ If .txt has no rule, Stash will prompt:
 No rule exists for files with the extension .txt
 Where should .txt files be sorted? (Enter folder name or press Enter to skip):
 ```
+---
 Configuration
 
 Rules
@@ -135,7 +137,7 @@ Tips
    •  To skip sorting a specific file type when prompted, simply press Enter.
    •  If you accidentally create an incorrect rule, you can edit rules.json manually.
    •  Stash logs sorted files during updates so you always know where they are moved.
-
+---
 Uninstalling Stash
 
 To remove Stash from your system:
@@ -148,6 +150,7 @@ sudo rm /usr/local/bin/stash
 ```bash
 rm -rf .stash
 ```
+---
 Contributing
 
 Contributions are welcome! To contribute:
@@ -164,7 +167,7 @@ git push origin feature-name
 ```
 
    4. Open a pull request.
-
+---
 License
 
 This project is licensed under the MIT License.
@@ -179,8 +182,8 @@ For feedback or issues, please open an issue on the GitHub repository.
 
 1. Save this as `README.md` in your project repository.
 2. Commit and push it to GitHub:
-   ```bash
-   git add README.md
-   git commit -m "Add detailed README file with usage instructions"
-   git push origin main
+```bash
+git add README.md
+git commit -m "Add detailed README file with usage instructions"
+git push origin main
 ```
