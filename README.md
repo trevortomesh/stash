@@ -136,11 +136,11 @@ Rules
 
 
 You can edit this file manually to add or modify rules.
-
-Tips
-   •  To skip sorting a specific file type when prompted, simply press Enter.
-   •  If you accidentally create an incorrect rule, you can edit rules.json manually.
-   •  Stash logs sorted files during updates so you always know where they are moved.
+---
+### Tips
+- To skip sorting a specific file type when prompted, simply press Enter.
+- If you accidentally create an incorrect rule, you can edit rules.json manually.
+- Stash logs sorted files during updates so you always know where they are moved.
 ---
 Uninstalling Stash
 
