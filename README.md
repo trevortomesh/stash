@@ -73,8 +73,8 @@ What happens during an update:
 No rule exists for files with the extension .txt
 Where should .txt files be sorted? (Enter folder name or press Enter to skip):
 
+Newly defined rules are saved persistently for future use.
 
-   •  Newly defined rules are saved persistently for future use.
 ---
 Example Workflow
 
