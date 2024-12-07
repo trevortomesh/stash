@@ -179,15 +179,3 @@ This project is licensed under the MIT License.
 Support
 
 For feedback or issues, please open an issue on the GitHub repository.
-
----
-
-### Next Steps
-
-1. Save this as `README.md` in your project repository.
-2. Commit and push it to GitHub:
-```bash
-git add README.md
-git commit -m "Add detailed README file with usage instructions"
-git push origin main
-```
