@@ -1,16 +1,23 @@
-# ![stash-ico](images/stash-ico.png)<u>Stash</u>
+# ![stash-ico](images/stash-ico.png) <u>Stash</u>
 
-**Stash** is a lightweight and powerful Python-based directory sorting tool. It helps you quickly organize and manage files in a directory by sorting them into folders based on file extensions or MIME types. Stash also allows you to interactively define sorting rules for new file types.
+**Stash** is a lightweight, powerful Python-based directory management tool. It allows you to sort, organize, deepstash, and restore files with ease. Stash tracks your files, keeps them organized, and ensures that even long-unused files can be safely stored elsewhere and easily restored when needed.
 
 ---
 
 ## Features
 
 - **Automatic Sorting**: Sort files into predefined folders (e.g., `Images`, `Documents`) based on file extensions or MIME types.
-- **Interactive Rules**: When a new file type is encountered, you can create a rule interactively.
-- **Persistent Configuration**: All sorting rules are saved to `rules.json` for future use.
-- **Log of Sorted Files**: Stash shows where files were moved during an update.
-- **Lightweight**: Runs as a simple Python script with no external dependencies.
+- **Interactive Rules**: Create new rules interactively when Stash encounters unknown file types.
+- **Persistent Configuration**: Sorting rules are saved in `rules.json` for future use.
+- **Deep Stash**: Automatically or manually move old files to an external drive for backup, replacing them with lightweight ghost files (`.ds`).
+- **Restore**: Restore files:
+  - All files.
+  - Files within a specific timeframe.
+  - Files from a specific folder and subfolders.
+  - A specific individual file.
+- **Status Command**: View a detailed summary of your stash, including the number of tracked, deep-stashed, and soon-to-be stashed files.
+- **Manual Deepstash**: Force deepstash specific files on demand.
+- **Lightweight and Portable**: Runs as a single Python script with minimal dependencies.
 
 ---
 
@@ -18,88 +25,179 @@
 
 ### Prerequisites
 
-Ensure you have **Python 3** installed on your system. You can check this by running:
+Ensure you have **Python 3** installed:
+
 ```bash
 python3 --version
 ```
-Step 1: Download Stash
 
-Clone the Stash repository or download the script directly:
+### Step 1: Download Stash
+
+Clone the repository:
+
 ```bash
 git clone https://github.com/trevortomesh/stash.git
 cd stash
 ```
-Alternatively, download the standalone script (stash) and place it in a directory of your choice.
 
-Step 2: Run the Install Script
+Or download the standalone script.
 
-The provided install.sh script will:
-	1.	Add the necessary shebang to stash.py.
-	2.	Rename it to stash.
-	3.	Make it executable.
-	4.	Move it to /usr/local/bin/ so it can be used globally as a command.
+### Step 2: Install Stash Globally
 
-To install, run:
+Run the installation script:
+
 ```bash
 chmod +x install.sh
 ./install.sh
 ```
-You’ll see confirmation messages, and stash will be installed successfully.
 
-   3. Verify the installation by running:
+This will:
+
+1. Make `stash` executable.
+2. Place it in `/usr/local/bin/` for global use.
+
+### Step 3: Verify Installation
+
 ```bash
 stash --help
 ```
+
 ---
-Usage
 
-1. Initialize a Stash
+## Usage
 
-Navigate to the directory you want to organize and initialize a stash:
+### 1. Initialize a Stash
+
+To start using Stash in a directory:
+
 ```bash
 stash init
 ```
+
 This command:
-   •  Creates a .stash folder to store configurations.
-   •  Logs the current files in stash.json.
-   •  Sets up default sorting rules (e.g., .png files to Images/, .pdf files to Documents/).
 
-2. Update a Stash
+- Creates a `.stash` folder to store configurations and logs.
+- Logs all files in `stash.json`.
+- Sets up a default deepstash threshold (30 days).
 
-To sort and organize new files in the directory, run:
+---
+
+### 2. Update a Stash
+
+To sort new files and deepstash old files:
+
 ```bash
 stash update
 ```
-What happens during an update:
-   •  Stash sorts files into appropriate folders based on the rules defined in rules.json.
-   •  If Stash encounters a new file type (e.g., .txt), it will ask you interactively where to place it:
 
-No rule exists for files with the extension .txt
-Where should .txt files be sorted? (Enter folder name or press Enter to skip):
-
-Newly defined rules are saved persistently for future use.
+- Files are sorted into appropriate folders.
+- Files older than the deepstash threshold (30 days by default) are deep-stashed and replaced with `.ds` ghost files.
+- Files close to the threshold (within 5 days) are flagged as "soon to be deep-stashed."
 
 ---
-Example Workflow
 
-Step 1: Create a Stash
+### 3. View Stash Status
+
+To check the current state of the stash:
+
+```bash
+stash status
+```
+
+Example Output:
+
+```
+=== Stash Status ===
+Stash Name: MyFiles
+External Drive: /Volumes/WD_BLACK
+Deepstash Threshold: 30 days
+
+Total Files Tracked: 50
+Files in Local Storage: 35
+Files in Deep Stash: 15
+Files Soon to Be Deep-Stashed: 5
+```
+
+---
+
+### 4. Manual Deepstash
+
+Force specific files to deepstash:
+
+```bash
+stash deepstash file1.txt file2.pdf
+```
+
+This moves the specified files to the external deepstash directory and replaces them with ghost files.
+
+---
+
+### 5. Restore Files
+
+Restore deep-stashed files using one of the options:
+
+- **Restore All Files**:
+
+  ```bash
+  stash restore
+  ```
+
+- **Restore Files from the Last 7 Days**:
+
+  ```bash
+  stash restore --timeframe 7
+  ```
+
+- **Restore Files from a Specific Folder**:
+
+  ```bash
+  stash restore --folder /path/to/folder
+  ```
+
+- **Restore a Specific File**:
+
+  ```bash
+  stash restore --file /path/to/file.txt
+  ```
+
+Example Output:
+
+```
+Restoring deep-stashed files...
+Restored '/Users/user/Documents/file1.pdf'
+Restored '/Users/user/Desktop/file2.png'
+Restoration complete. Files restored: 2
+```
+
+---
+
+### Example Workflow
+
+#### Step 1: Create a Stash
+
 ```bash
 mkdir MyFiles
 cd MyFiles
 stash init
 ```
-Step 2: Add Some Files
+
+#### Step 2: Add Files
+
 ```
 MyFiles/
 ├── photo1.png
 ├── report.pdf
 ├── notes.txt
 ```
-Step 3: Update the Stash
+
+#### Step 3: Update Stash
+
 ```bash
 stash update
 ```
-Resulting Directory Structure:
+
+Resulting Structure:
+
 ```
 MyFiles/
 ├── Documents/
@@ -108,19 +206,36 @@ MyFiles/
 │   └── photo1.png
 ├── notes.txt
 ```
-If .txt has no rule, Stash will prompt:
+
+#### Step 4: Force Deepstash a File
+
 ```bash
-No rule exists for files with the extension .txt
-Where should .txt files be sorted? (Enter folder name or press Enter to skip):
+stash deepstash notes.txt
 ```
+
+#### Step 5: Check Status
+
+```bash
+stash status
+```
+
+#### Step 6: Restore Files
+
+Restore `notes.txt`:
+
+```bash
+stash restore --file notes.txt
+```
+
 ---
-Configuration
 
-Rules
-   •  Rules are stored in the rules.json file inside the .stash directory.
-   •  Example:
+## Configuration
 
-   ```json
+### Rules
+
+Rules are saved in `rules.json` within the `.stash` directory:
+
+```json
 {
     "extensions": {
         "png": "Images",
@@ -134,48 +249,65 @@ Rules
 }
 ```
 
+Edit this file manually to add or modify rules.
 
-You can edit this file manually to add or modify rules.
 ---
+
 ### Tips
-- To skip sorting a specific file type when prompted, simply press Enter.
-- If you accidentally create an incorrect rule, you can edit rules.json manually.
-- Stash logs sorted files during updates so you always know where they are moved.
----
-Uninstalling Stash
 
-To remove Stash from your system:
-   1. Delete the executable from /usr/local/bin:
+- To **skip sorting** a file type during prompts, press **Enter**.
+- Edit `rules.json` to fix incorrect sorting rules.
+- Use `stash status` regularly to monitor the state of your files.
+
+---
+
+## Uninstallation
+
+### Remove the Stash Executable
+
 ```bash
 sudo rm /usr/local/bin/stash
 ```
 
-   2. Remove the .stash folder in any directories where Stash was used:
+### Remove `.stash` Configuration Folders
+
+In directories where Stash was used:
+
 ```bash
 rm -rf .stash
 ```
+
 ---
-Contributing
 
-Contributions are welcome! To contribute:
-   1. Fork the repository.
-   2. Create a feature branch:
-```bash
-git checkout -b feature-name
-```
+## Contributing
 
-   3. Commit your changes and push:
-```bash
-git commit -m "Add a new feature"
-git push origin feature-name
-```
+We welcome contributions! To contribute:
 
-   4. Open a pull request.
+1. Fork the repository.
+
+2. Create a feature branch:
+
+   ```bash
+   git checkout -b feature-name
+   ```
+
+3. Commit and push:
+
+   ```bash
+   git commit -m "Add feature X"
+   git push origin feature-name
+   ```
+
+4. Open a pull request.
+
 ---
-License
+
+## License
 
 This project is licensed under the MIT License.
 
-Support
+---
 
-For feedback or issues, please open an issue on the GitHub repository.
+## Support
+
+For feedback, questions, or issues, please open an issue on the GitHub repository.
