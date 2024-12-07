@@ -1,4 +1,4 @@
-# ![stash-ico](/Users/trevortomesh/Github/stash/images/stash-ico.png)<u>Stash</u> 
+# ![stash-ico](images/stash-ico.png)<u>Stash</u> 
 
 **Stash** is a simple, yet powerful Python-based tool that helps you organize and manage files in a directory. It sorts files into folders based on their extensions or MIME types, with the ability to define custom sorting rules interactively.
 
