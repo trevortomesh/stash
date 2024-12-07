@@ -26,7 +26,7 @@ Step 1: Download Stash
 
 Clone the Stash repository or download the script directly:
 ```bash
-git clone https://github.com/yourusername/stash.git
+git clone https://github.com/trevortomesh/stash.git
 cd stash
 ```
 Alternatively, download the standalone script (stash) and place it in a directory of your choice.
