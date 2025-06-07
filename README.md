@@ -1,6 +1,6 @@
 # ![stash-ico](images/stash-ico.png) <u>Stash</u>
 
-**Stash** is a lightweight, powerful Python-based directory management tool. It allows you to sort, organize, deepstash, and restore files with ease. Stash tracks your files, keeps them organized, and ensures that even long-unused files can be safely stored elsewhere and easily restored when needed.
+**Stash** is a lightweight, powerful Python-based directory management tool. It allows you to sort and organize files with ease.
 
 ---
 
@@ -9,14 +9,7 @@
 - **Automatic Sorting**: Sort files into predefined folders (e.g., `Images`, `Documents`) based on file extensions or MIME types.
 - **Interactive Rules**: Create new rules interactively when Stash encounters unknown file types.
 - **Persistent Configuration**: Sorting rules are saved in `rules.json` for future use.
-- **Deep Stash**: Automatically or manually move old files to an external drive for backup, replacing them with lightweight ghost files (`.ds`).
-- **Restore**: Restore files:
-  - All files.
-  - Files within a specific timeframe.
-  - Files from a specific folder and subfolders.
-  - A specific individual file.
-- **Status Command**: View a detailed summary of your stash, including the number of tracked, deep-stashed, and soon-to-be stashed files.
-- **Manual Deepstash**: Force deepstash specific files on demand.
+- **Status Command**: View a detailed summary of your stash, including the number of tracked files.
 - **Lightweight and Portable**: Runs as a single Python script with minimal dependencies.
 
 ---
@@ -42,21 +35,21 @@ cd stash
 
 Or download the standalone script.
 
-### Step 2: Install Stash Globally
+### Step 2: Install with pip
 
-Run the installation script:
+Install Stash using pip:
 
 ```bash
-chmod +x install.sh
-./install.sh
+pip install stash-organizer
 ```
 
-This will:
+Or, if you cloned the repository locally:
 
-1. Make `stash` executable.
-2. Place it in `/usr/local/bin/` for global use.
+```bash
+pip install .
+```
 
-### Step 3: Verify Installation
+Verify the installation by running:
 
 ```bash
 stash --help
@@ -78,21 +71,18 @@ This command:
 
 - Creates a `.stash` folder to store configurations and logs.
 - Logs all files in `stash.json`.
-- Sets up a default deepstash threshold (30 days).
 
 ---
 
 ### 2. Update a Stash
 
-To sort new files and deepstash old files:
+To sort new files:
 
 ```bash
 stash update
 ```
 
 - Files are sorted into appropriate folders.
-- Files older than the deepstash threshold (30 days by default) are deep-stashed and replaced with `.ds` ghost files.
-- Files close to the threshold (within 5 days) are flagged as "soon to be deep-stashed."
 
 ---
 
@@ -109,64 +99,9 @@ Example Output:
 ```
 === Stash Status ===
 Stash Name: MyFiles
-External Drive: /Volumes/WD_BLACK
-Deepstash Threshold: 30 days
 
 Total Files Tracked: 50
 Files in Local Storage: 35
-Files in Deep Stash: 15
-Files Soon to Be Deep-Stashed: 5
-```
-
----
-
-### 4. Manual Deepstash
-
-Force specific files to deepstash:
-
-```bash
-stash deepstash file1.txt file2.pdf
-```
-
-This moves the specified files to the external deepstash directory and replaces them with ghost files.
-
----
-
-### 5. Restore Files
-
-Restore deep-stashed files using one of the options:
-
-- **Restore All Files**:
-
-  ```bash
-  stash restore
-  ```
-
-- **Restore Files from the Last 7 Days**:
-
-  ```bash
-  stash restore --timeframe 7
-  ```
-
-- **Restore Files from a Specific Folder**:
-
-  ```bash
-  stash restore --folder /path/to/folder
-  ```
-
-- **Restore a Specific File**:
-
-  ```bash
-  stash restore --file /path/to/file.txt
-  ```
-
-Example Output:
-
-```
-Restoring deep-stashed files...
-Restored '/Users/user/Documents/file1.pdf'
-Restored '/Users/user/Desktop/file2.png'
-Restoration complete. Files restored: 2
 ```
 
 ---
@@ -207,24 +142,10 @@ MyFiles/
 ├── notes.txt
 ```
 
-#### Step 4: Force Deepstash a File
-
-```bash
-stash deepstash notes.txt
-```
-
-#### Step 5: Check Status
+#### Step 4: Check Status
 
 ```bash
 stash status
-```
-
-#### Step 6: Restore Files
-
-Restore `notes.txt`:
-
-```bash
-stash restore --file notes.txt
 ```
 
 ---
@@ -311,3 +232,10 @@ This project is licensed under the MIT License.
 ## Support
 
 For feedback, questions, or issues, please open an issue on the GitHub repository.
+
+---
+
+## Related Projects
+
+- **DeepStash** – A sister project to Stash that provides advanced long-term archival and external drive backup for deeply cold files.  
+  [https://github.com/trevortomesh/deep-stash](https://github.com/trevortomesh/deep-stash)
