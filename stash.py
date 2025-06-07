@@ -9,37 +9,27 @@ import mimetypes
 
 class DirectoryStash:
     STASH_DIR = ".stash"
-    STASH_FILE = "stash.json"
     RULES_FILE = "rules.json"
     FOLDER_SORT_DIR = "Folders"
 
     def __init__(self, directory=None):
         self.directory = os.path.abspath(directory or os.getcwd())
         self.stash_dir = os.path.join(self.directory, self.STASH_DIR)
-        self.stash_file = os.path.join(self.stash_dir, self.STASH_FILE)
         self.rules_file = os.path.join(self.stash_dir, self.RULES_FILE)
-        self.stash_data = self._load_stash()
         self.rules = self._load_rules()
         self.error_cache = set()
 
     def initialize(self):
-        if os.path.exists(self.stash_file):
-            print("Stash already initialized.")
+        if os.path.exists(self.stash_dir):
+            print("📦 Stash already initialized.")
             return
 
-        self.stash_data = {
-            "name": os.path.basename(self.directory),
-            "created_at": datetime.now().isoformat(),
-            "items": []
-        }
-
         os.makedirs(self.stash_dir, exist_ok=True)
-        self._save_stash()
         self._save_rules()
-        print("Stash initialized successfully.")
+        print("✅ Stash initialized successfully.")
 
     def update(self, verbose=False):
-        print("Updating stash...")
+        print("🔄 Updating stash...")
         now = datetime.now()
 
         all_files = []
@@ -62,22 +52,21 @@ class DirectoryStash:
             try:
                 shutil.move(folder, dest)
                 if verbose:
-                    print(f"Moved folder '{folder}' to '{dest}'")
+                    print(f"📁 Moved folder '{folder}' to '{dest}'")
             except Exception as e:
                 if verbose:
-                    print(f"Could not move '{folder}' to '{dest}': {e}")
+                    print(f"⚠️ Could not move '{folder}' to '{dest}': {e}")
 
         for file_path in all_files:
             try:
                 result = self._sort_file(file_path)
                 if result and verbose:
-                    print(f"Moved '{file_path}' to '{result}'")
+                    print(f"📄 Moved '{file_path}' to '{result}'")
             except Exception as e:
-                print(f"Skipped '{file_path}': {e}")
+                print(f"⏭️ Skipped '{file_path}': {e}")
 
-        self._save_stash()
         self._save_rules()
-        print("Update complete.")
+        print("🎉 Update complete.")
 
     def _sort_file(self, file_path):
         extension = os.path.splitext(file_path)[1][1:].lower()
@@ -112,24 +101,21 @@ class DirectoryStash:
         with open(self.rules_file, "w") as file:
             json.dump(self.rules, file, indent=4)
 
-    def _load_stash(self):
-        return json.load(open(self.stash_file, "r")) if os.path.exists(self.stash_file) else {"items": []}
-
-    def _save_stash(self):
-        os.makedirs(self.stash_dir, exist_ok=True)
-        with open(self.stash_file, "w") as file:
-            json.dump(self.stash_data, file, indent=4)
-
 def main():
-    parser = argparse.ArgumentParser(description="Manage a directory stash.")
-    subparsers = parser.add_subparsers(dest="command")
+    parser = argparse.ArgumentParser(
+        prog="stash",
+        description="📂 Manage a directory stash✨",
+        epilog="✨ Example: stash update --verbose",
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+    subparsers = parser.add_subparsers(title="📜 Commands", dest="command", metavar="")
 
-    subparsers.add_parser("init", help="Initialize the stash.")
+    subparsers.add_parser("init", help="🆕 Initialize the stash.")
     update_parser = subparsers.add_parser(
         "update",
-        help="Update the stash (sorts files in root, prompts for new types, supports 'ignore' list in rules.json)."
+        help="♻️ Update the stash (sort and organize your files)."
     )
-    update_parser.add_argument("--verbose", action="store_true", help="Show detailed update actions.")
+    update_parser.add_argument("--verbose", action="store_true", help="🔍 Show detailed update actions.")
 
     args = parser.parse_args()
     stash = DirectoryStash()
