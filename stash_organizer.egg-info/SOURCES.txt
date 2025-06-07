@@ -1,0 +1,9 @@
+LICENSE
+README.md
+setup.py
+stash.py
+stash_organizer.egg-info/PKG-INFO
+stash_organizer.egg-info/SOURCES.txt
+stash_organizer.egg-info/dependency_links.txt
+stash_organizer.egg-info/entry_points.txt
+stash_organizer.egg-info/top_level.txt
