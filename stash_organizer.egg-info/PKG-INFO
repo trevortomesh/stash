@@ -27,277 +27,181 @@ Dynamic: summary
 <p align="center">
   <img alt="Python 3.6+" src="https://img.shields.io/badge/Python-3.6+-blue?logo=python&logoColor=white&style=flat-square"/>
   <img alt="Vibe-Coded" src="https://img.shields.io/badge/Vibe%20Coded-%F0%9F%92%8C-purple?style=flat-square"/>
-  <a href="https://github.com/trevortomesh/fearfully-coded">
+  <a href="#-dedication">
     <img alt="Fearfully Coded" src="https://img.shields.io/badge/🕊️Fearfully%20Coded-blue?style=flat-square"/>
   </a>
 </p>
 
-----
-
-# ![stash-ico](images/stash-ico.png) <u>Stash</u>
-
-**Stash** is a lightweight, powerful Python-based directory management tool. It allows you to sort and organize files with ease.
-
----
+Stash is a powerful file organization tool that helps you sort, archive, and manage your files efficiently.
 
 ## Features
 
-- **Automatic Sorting**: Sort files into predefined folders (e.g., `Images`, `Documents`) based on file extensions or MIME types.
-- **Interactive Rules**: Create new rules interactively when Stash encounters unknown file types.
-- **Persistent Configuration**: Sorting rules are saved in `rules.json` for future use.
-- **Status Command**: View a detailed summary of your stash, including the number of tracked files.
-- **Lightweight and Portable**: Runs as a single Python script with minimal dependencies.
+- **Automatic Sorting**  
+  Organizes files based on rules you define in a `rules.json` file. You can sort by file extension, MIME type, or interactively when a new type is encountered.
 
----
+- **Interactive Rule Creation**  
+  When a file with an unknown extension is found, Stash will prompt you to specify a folder. The rule is saved automatically for future use.
+
+- **Ignore List Support**  
+  Prevent specific file types from being sorted at all by adding them to an `"ignore"` list in your rules file.
+
+- **Non-Recursive Operation**  
+  Stash only sorts files in the top-level directory—subfolders are never entered or altered unless explicitly moved.
+
+- **Capitalized Folder Targets**  
+  By convention, folders like `Images`, `Videos`, or `Docs` are used as sorting targets, keeping your directory clean and readable.
+
+- **Portable & Minimal Dependencies**  
+  Runs as a standalone Python script without requiring a full framework or complex setup.
+
+- **Optional macOS Folder Icon Assignment**  
+  On macOS, you can assign custom icons to your `stash` folders to make them easier to identify visually.
+
+- **Integration with DeepStash**  
+  Easily move older or bulk files out of your main stash into a cold storage system using the DeepStash companion tool.
+
+## 🧠 Origins
+
+Stash began as a conceptual data structure — a digital “box” where users could throw anything with the intention of sorting it later. Inspired by the human habit of stashing files and folders into catch-all directories, this project set out to turn that chaos into structured automation.
+What started as an abstract idea evolved into a real-world command-line tool that helps users organize their filesystem with minimal effort and maximum flexibility.
 
 ## Installation
 
-### Prerequisites
-
-Ensure you have **Python 3** installed:
+### From PyPI (if available)
 
 ```bash
-python3 --version
+pip install stash
 ```
 
-### Step 1: Download Stash
+### From Source (Recommended for Development)
 
-Clone the repository:
+Clone the repository and install locally:
 
 ```bash
 git clone https://github.com/trevortomesh/stash.git
 cd stash
-```
-
-Or download the standalone script.
-
-### Step 2: Install with pip
-
-Install Stash using pip:
-
-```bash
-pip install stash-organizer
-```
-
-Or, if you cloned the repository locally:
-
-```bash
 pip install .
 ```
 
-Verify the installation by running:
+Or install in editable mode for development:
+
+```bash
+pip install -e .
+```
+
+This allows you to make changes to the source code and use the updated `stash` command without reinstalling.
+
+## Troubleshooting
+
+If you encounter issues, try the following:
+
+- Ensure Python 3.6+ is installed
+- Check your PATH environment variable includes Python scripts
+- Use `stash --help` to review command options
+- Report bugs on GitHub Issues
+
+## Usage
+
+Basic usage example:
+
+```bash
+stash sort /path/to/your/files
+```
+
+For more commands and options, use:
 
 ```bash
 stash --help
 ```
 
----
-
-## Usage
-
-### 1. Initialize a Stash
-
-To start using Stash in a directory:
-
-```bash
-stash init
-```
-
-This command:
-
-- Creates a `.stash` folder to store configurations and logs.
-- Logs all files in `stash.json`.
-
----
-
-### 2. Update a Stash
-
-To sort new files:
-
-```bash
-stash update
-```
-
-- Files are sorted into appropriate folders.
-
----
-
-### 3. View Stash Status
-
-To check the current state of the stash:
-
-```bash
-stash status
-```
-
-Example Output:
-
-```
-=== Stash Status ===
-Stash Name: MyFiles
-
-Total Files Tracked: 50
-Files in Local Storage: 35
-```
-
----
-
-### Example Workflow
-
-#### Step 1: Create a Stash
-
-```bash
-mkdir MyFiles
-cd MyFiles
-stash init
-```
-
-#### Step 2: Add Files
-
-```
-MyFiles/
-├── photo1.png
-├── report.pdf
-├── notes.txt
-```
-
-#### Step 3: Update Stash
-
-```bash
-stash update
-```
-
-Resulting Structure:
-
-```
-MyFiles/
-├── Documents/
-│   └── report.pdf
-├── Images/
-│   └── photo1.png
-├── notes.txt
-```
-
-#### Step 4: Check Status
-
-```bash
-stash status
-```
-
----
-
 ## Configuration
 
-### Rules
-
-Rules are saved in `rules.json` within the `.stash` directory:
+Stash uses a `rules.json` file inside each `.stash` directory to determine how files are sorted. Example:
 
 ```json
 {
     "extensions": {
+        "txt": "Docs",
+        "ics": "Docs",
         "png": "Images",
-        "pdf": "Documents",
-        "txt": "TextFiles"
+        "ds": "Deep",
+        "jpeg": "Images",
+        "excalidraw": "Docs"
     },
-    "mime_types": {
-        "application/pdf": "Documents",
-        "image/png": "Images"
-    }
+    "mime_types": {}
 }
 ```
 
-You can also add an "ignore" list to prevent certain file types from being moved:
+## Tips
 
-```json
-{
-    "ignore": ["log", "tmp"]
-}
-```
-
-These extensions will be skipped during `stash update`.
-
-Additionally, when Stash encounters a file type with no rule defined, it will prompt you interactively to assign a folder name. Press Enter to skip a type without assigning a rule.
-
----
-
-### Tips
-
-- To **skip sorting** a file type during prompts, press **Enter**.
-- Edit `rules.json` to fix incorrect sorting rules.
-- Use `stash status` regularly to monitor the state of your files.
-
----
+- Periodically check your sorted folders to ensure files are going to the expected locations.
+- Combine with DeepStash for cold storage management.
 
 ## Uninstallation
 
-### Remove the Stash Executable
+To uninstall Stash:
 
 ```bash
-sudo rm /usr/local/bin/stash
+pip uninstall stash
 ```
-
-### Remove `.stash` Configuration Folders
-
-In directories where Stash was used:
-
-```bash
-rm -rf .stash
-```
-
----
 
 ## Contributing
 
-We welcome contributions! To contribute:
-
-1. Fork the repository.
-
-2. Create a feature branch:
-
-   ```bash
-   git checkout -b feature-name
-   ```
-
-3. Commit and push:
-
-   ```bash
-   git commit -m "Add feature X"
-   git push origin feature-name
-   ```
-
-4. Open a pull request.
-
----
+Contributions are welcome! Please fork the repository and submit a pull request.
 
 ## License
 
-This project is licensed under the MIT License.
-
----
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Support
 
-For feedback, questions, or issues, please open an issue on the GitHub repository.
-
----
+For support, open an issue on GitHub or contact the maintainer.
 
 ## Related Projects
 
-- **DeepStash** – A sister project to Stash that provides advanced long-term archival and external drive backup for deeply cold files.  
+- **DeepStASH** – A sister project to Stash that provides advanced long-term archival and external drive backup for deeply cold files.  
   [https://github.com/trevortomesh/deep-stash](https://github.com/trevortomesh/deep-stash)
 
-----
-## 🧠 Philosophy
+  ### 🧊 Suggested Use:
+  You can find and install DeepStash here: https://github.com/trevortomesh/deep-stash
 
-Stash began as a conceptual data structure — a digital “box” where users could throw anything with the intention of sorting it later. Inspired by the human habit of stashing files and folders into catch-all directories, this project set out to turn that chaos into structured automation.
-What started as an abstract idea evolved into a real-world command-line tool that helps users organize their filesystem with minimal effort and maximum flexibility.
+  DeepStash is designed to work alongside Stash — but it also stands strong on its own. Use it to offload files and folders to a long-term archive (such as an external drive) while keeping their original location and context intact via `.ds` metadata files.
 
-----
-## 🤖 Note
+  It safely stashes your items elsewhere, leaving behind smart placeholders you can use to restore them at any time. Perfect for cleaning up your workspace without breaking your mental map of where everything lives.
 
-This tool was created using **vibe coding** — describing what I wanted to an AI assistant, refining the results through iteration. No detailed plan — just intuition, adaptation, and execution.
+  To install:
+  ```bash
+  git clone https://github.com/trevortomesh/deep-stash.git
+  cd deep-stash
+  pip install .
+  ```
 
-----
+  To use:
+
+  1. Set the stash location:
+     ```bash
+     ds --init
+     ```
+
+  2. Stash an item:
+     ```bash
+     ds FinalPaper.pdf
+     ```
+
+  3. Restore an item:
+     ```bash
+     ds FinalPaper.pdf.ds
+     ```
+
+  4. View help and advanced options:
+     ```bash
+     ds --help
+     ```
+
+  DeepStash integrates beautifully with Stash to offload rarely used files after sorting — but it's equally effective on its own when you just need to move things without losing your structure.
+
+---
+
 ## 🕊️ Dedication
 
 This project is dedicated to the Lord.
