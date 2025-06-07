@@ -1,23 +1,76 @@
-# Stash
+<p align="center">
+  <img src="images/stash-with-text.png" alt="Stash logo" width="300"/>
+</p>
 
-[![Build Status](https://github.com/trevortomesh/stash/workflows/CI/badge.svg)](https://github.com/trevortomesh/stash/actions)
-[![PyPI version](https://badge.fury.io/py/stash.svg)](https://badge.fury.io/py/stash)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+<p align="center">
+  <img alt="Python 3.6+" src="https://img.shields.io/badge/Python-3.6+-blue?logo=python&logoColor=white&style=flat-square"/>
+  <img alt="Vibe-Coded" src="https://img.shields.io/badge/Vibe%20Coded-%F0%9F%92%8C-purple?style=flat-square"/>
+  <a href="#-dedication">
+    <img alt="Fearfully Coded" src="https://img.shields.io/badge/🕊️Fearfully%20Coded-blue?style=flat-square"/>
+  </a>
+</p>
 
 Stash is a powerful file organization tool that helps you sort, archive, and manage your files efficiently.
 
 ## Features
 
-- Organize files by type, date, or custom rules
-- Support for archiving and backup
-- Easy to use CLI interface
-- Extensible with plugins
+- **Automatic Sorting**  
+  Organizes files based on rules you define in a `rules.json` file. You can sort by file extension, MIME type, or interactively when a new type is encountered.
+
+- **Interactive Rule Creation**  
+  When a file with an unknown extension is found, Stash will prompt you to specify a folder. The rule is saved automatically for future use.
+
+- **Ignore List Support**  
+  Prevent specific file types from being sorted at all by adding them to an `"ignore"` list in your rules file.
+
+- **Non-Recursive Operation**  
+  Stash only sorts files in the top-level directory—subfolders are never entered or altered unless explicitly moved.
+
+- **Capitalized Folder Targets**  
+  By convention, folders like `Images`, `Videos`, or `Docs` are used as sorting targets, keeping your directory clean and readable.
+
+- **Status Overview**  
+  The `stash status` command shows how many files have been sorted and how many remain, providing a quick snapshot of progress.
+
+- **Portable & Minimal Dependencies**  
+  Runs as a standalone Python script without requiring a full framework or complex setup.
+
+- **Optional macOS Folder Icon Assignment**  
+  On macOS, you can assign custom icons to your `stash` folders to make them easier to identify visually.
+
+- **Integration with DeepStash**  
+  Easily move older or bulk files out of your main stash into a cold storage system using the DeepStash companion tool.
+
+## 🧠 Origins
+
+Stash began as a conceptual data structure — a digital “box” where users could throw anything with the intention of sorting it later. Inspired by the human habit of stashing files and folders into catch-all directories, this project set out to turn that chaos into structured automation.
+What started as an abstract idea evolved into a real-world command-line tool that helps users organize their filesystem with minimal effort and maximum flexibility.
 
 ## Installation
+
+### From PyPI (if available)
 
 ```bash
 pip install stash
 ```
+
+### From Source (Recommended for Development)
+
+Clone the repository and install locally:
+
+```bash
+git clone https://github.com/trevortomesh/stash.git
+cd stash
+pip install .
+```
+
+Or install in editable mode for development:
+
+```bash
+pip install -e .
+```
+
+This allows you to make changes to the source code and use the updated `stash` command without reinstalling.
 
 ## Troubleshooting
 
@@ -56,7 +109,7 @@ sort_rules:
 
 ## Tips
 
-- Use `stash preview` to see what changes will be made without applying them.
+- Use `stash status` to review what files have been sorted and what remains in the stash directory.
 - Combine with DeepStash for cold storage management.
 
 ## Uninstallation
@@ -121,3 +174,17 @@ For support, open an issue on GitHub or contact the maintainer.
      ```
 
   DeepStash integrates beautifully with Stash to offload rarely used files after sorting — but it's equally effective on its own when you just need to move things without losing your structure.
+
+---
+
+## 🕊️ Dedication
+
+This project is dedicated to the Lord.
+
+All logic, structure, and order — including the very foundations of programming — reflect the perfection of His design. May this tool, in its small way, point toward the beauty and coherence He has written into the fabric of creation.
+
+> **"I praise you, for I am fearfully and wonderfully made.  
+> Wonderful are your works; my soul knows it very well."**  
+> — Psalm 139:14
+
+**Soli Deo Gloria.**
