@@ -3,15 +3,15 @@
 import os
 import json
 import shutil
+import argparse
 from datetime import datetime, timedelta
 import mimetypes
-import argparse
-
 
 class DirectoryStash:
     STASH_DIR = ".stash"
     STASH_FILE = "stash.json"
     RULES_FILE = "rules.json"
+    FOLDER_SORT_DIR = "Folders"
 
     def __init__(self, directory=None):
         self.directory = os.path.abspath(directory or os.getcwd())
@@ -20,6 +20,7 @@ class DirectoryStash:
         self.rules_file = os.path.join(self.stash_dir, self.RULES_FILE)
         self.stash_data = self._load_stash()
         self.rules = self._load_rules()
+        self.error_cache = set()
 
     def initialize(self):
         if os.path.exists(self.stash_file):
@@ -42,105 +43,152 @@ class DirectoryStash:
         self._save_rules()
         print("Stash initialized successfully.")
 
-    def update(self):
+    def update(self, verbose=False):
         print("Updating stash...")
         now = datetime.now()
+
+        if not self.stash_data.get("external_drive"):
+            while True:
+                external_drive = input("No deepstash location set. Enter the path to the external drive for deep stash: ").strip()
+                if external_drive and os.path.isdir(external_drive):
+                    self.stash_data["external_drive"] = os.path.abspath(external_drive)
+                    self._save_stash()
+                    print(f"Deepstash location set to: {self.stash_data['external_drive']}")
+                    break
+                else:
+                    print("Invalid path. Please enter a valid directory path.")
+
+        external_drive = self.stash_data["external_drive"]
         deepstash_days = self.stash_data.get("deepstash_days", 30)
-        external_drive = self.stash_data.get("external_drive")
 
-        if not external_drive:
-            print("Error: No external drive configured for deep stash.")
-            return
+        all_files = []
+        subdirs_to_sort = []
 
-        root_files = [f for f in os.listdir(self.directory)
-                      if os.path.isfile(os.path.join(self.directory, f)) and not f.startswith('.')]
+        top_level = os.listdir(self.directory)
+        for item in top_level:
+            full_path = os.path.join(self.directory, item)
+            if os.path.isdir(full_path):
+                if item not in (self.STASH_DIR, "Keep", self.FOLDER_SORT_DIR) and item not in set(self.rules.get("extensions", {}).values()):
+                    subdirs_to_sort.append(full_path)
+            elif os.path.isfile(full_path) and not item.startswith('.') and not item.endswith(".ds"):
+                all_files.append(full_path)
+
+        for folder in subdirs_to_sort:
+            if os.path.abspath(folder) == os.path.abspath(os.path.join(self.directory, self.FOLDER_SORT_DIR)):
+                continue
+            dest = os.path.join(self.directory, self.FOLDER_SORT_DIR, os.path.basename(folder))
+            os.makedirs(os.path.dirname(dest), exist_ok=True)
+            try:
+                shutil.move(folder, dest)
+                if verbose:
+                    print(f"Moved folder '{folder}' to '{dest}'")
+            except Exception as e:
+                if verbose:
+                    print(f"Could not move '{folder}' to '{dest}': {e}")
 
         deepstashed_count = 0
-        soon_to_be_stashed = 0
+        soon_to_be_stashed = []
 
-        for file in root_files:
-            file_path = os.path.join(self.directory, file)
+        folders_dir = os.path.join(self.directory, self.FOLDER_SORT_DIR)
+        if os.path.exists(folders_dir):
+            for folder_name in os.listdir(folders_dir):
+                folder_path = os.path.join(folders_dir, folder_name)
+                if not os.path.isdir(folder_path):
+                    continue
+                try:
+                    folder_mtime = datetime.fromtimestamp(os.path.getmtime(folder_path))
+                    days_since_modified = (now - folder_mtime).days
+                    if days_since_modified >= deepstash_days:
+                        self._move_folder_to_deepstash(folder_path, external_drive)
+                        deepstashed_count += 1
+                    elif days_since_modified >= (deepstash_days - 5):
+                        soon_to_be_stashed.append((folder_path, deepstash_days - days_since_modified))
+                except Exception as e:
+                    err_msg = str(e)
+                    if err_msg not in self.error_cache:
+                        print(f"Error processing folder '{folder_path}': {err_msg}")
+                        self.error_cache.add(err_msg)
 
-            if not os.path.exists(file_path):
-                print(f"Skipping missing file: {file_path}")
-                continue
-
-            sorted_path = self._sort_file(file_path)
-            if sorted_path != file_path:
-                file_path = sorted_path
-
-            last_modified = datetime.fromtimestamp(os.path.getmtime(file_path))
-            days_since_modified = (now - last_modified).days
-
-            if days_since_modified >= deepstash_days:
-                self._move_to_deepstash(file_path, external_drive)
-                deepstashed_count += 1
-            elif days_since_modified >= (deepstash_days - 5):
-                soon_to_be_stashed += 1
+        for file_path in all_files:
+            try:
+                self._sort_file(file_path)
+            except Exception as e:
+                if verbose:
+                    print(f"Error sorting file '{file_path}': {e}")
 
         self._save_stash()
         self._save_rules()
         print(f"Update complete. Files deep-stashed: {deepstashed_count}")
-        print(f"Files soon to be deep-stashed: {soon_to_be_stashed}")
+        print(f"Folders soon to be deep-stashed: {len(soon_to_be_stashed)}")
+        for path, days in soon_to_be_stashed:
+            print(f"  → {path} in {days} days")
 
     def status(self):
-        print("=== Stash Status ===")
-        total_files = len(self.stash_data["items"])
-        local_files = sum(1 for item in self.stash_data["items"] if item.get("location") == "LOCAL")
-        deepstashed_files = sum(1 for item in self.stash_data["items"] if item.get("location") == "DEEP_STASH")
+        print("Stash status:")
+        print(json.dumps(self.stash_data, indent=4))
 
-        print(f"Total Files Tracked: {total_files}")
-        print(f"Files in Local Storage: {local_files}")
-        print(f"Files in Deep Stash: {deepstashed_files}")
-
-    def force_deepstash(self, files):
+    def force(self, target):
+        full_path = os.path.join(self.directory, target)
         external_drive = self.stash_data.get("external_drive")
         if not external_drive:
-            print("Error: No external drive configured for deep stash.")
+            print("No deepstash location set.")
             return
+        if os.path.isdir(full_path):
+            self._move_folder_to_deepstash(full_path, external_drive)
+            print(f"Folder '{target}' forcibly deep-stashed.")
+        elif os.path.isfile(full_path):
+            self._move_file_to_deepstash(full_path, external_drive)
+            print(f"File '{target}' forcibly deep-stashed.")
+        else:
+            print(f"Target '{target}' does not exist.")
 
-        for file in files:
-            file_path = os.path.abspath(file)
-            if not os.path.exists(file_path):
-                print(f"File not found: {file}")
-                continue
+    def restore(self, target):
+        if not target.endswith(".ds"):
+            target += ".ds"
+        ghost_path = os.path.join(self.directory, self.STASH_DIR, target)
+        if not os.path.exists(ghost_path):
+            print(f"No .ds file found for '{target}'.")
+            return
+        with open(ghost_path, "r") as f:
+            data = json.load(f)
+        if data["type"] == "folder":
+            shutil.copytree(data["deep_stash_path"], data["original_path"], dirs_exist_ok=True)
+            print(f"Restored folder: {data['original_path']}")
+        else:
+            shutil.copy2(data["deep_stash_path"], data["original_path"])
+            print(f"Restored file: {data['original_path']}")
 
-            self._move_to_deepstash(file_path, external_drive)
-        self._save_stash()
+    def _move_folder_to_deepstash(self, folder_path, external_drive):
+        deepstash_dir = os.path.join(external_drive, "deepstash")
+        os.makedirs(deepstash_dir, exist_ok=True)
+        dest = os.path.join(deepstash_dir, os.path.basename(folder_path))
+        shutil.copytree(folder_path, dest, dirs_exist_ok=True)
+        shutil.rmtree(folder_path)
 
-    def restore(self, timeframe=None, folder=None, file_to_restore=None):
-        print("Restoring deep-stashed files...")
-        now = datetime.now()
+        ghost_file_path = f"{folder_path}.ds"
+        with open(ghost_file_path, "w") as ghost_file:
+            json.dump({
+                "type": "folder",
+                "deep_stash_path": dest,
+                "original_path": folder_path,
+                "modified_at": datetime.now().isoformat()
+            }, ghost_file)
 
-        for root, _, files in os.walk(self.directory):
-            for file in files:
-                if not file.endswith(".ds"):
-                    continue
+    def _move_file_to_deepstash(self, file_path, external_drive):
+        deepstash_dir = os.path.join(external_drive, "deepstash")
+        os.makedirs(deepstash_dir, exist_ok=True)
+        dest = os.path.join(deepstash_dir, os.path.basename(file_path))
+        shutil.copy2(file_path, dest)
+        os.remove(file_path)
 
-                ghost_file_path = os.path.join(root, file)
-                with open(ghost_file_path, "r") as ghost_file:
-                    data = json.load(ghost_file)
-
-                deep_stash_path = data["deep_stash_path"]
-                original_path = data["original_path"]
-
-                if file_to_restore and os.path.abspath(file_to_restore) != os.path.abspath(original_path):
-                    continue
-
-                if folder and not os.path.abspath(original_path).startswith(os.path.abspath(folder)):
-                    continue
-
-                if timeframe:
-                    days_ago = now - timedelta(days=int(timeframe))
-                    modified_date = datetime.fromisoformat(data["modified_at"])
-                    if modified_date < days_ago:
-                        continue
-
-                if os.path.exists(deep_stash_path):
-                    os.makedirs(os.path.dirname(original_path), exist_ok=True)
-                    shutil.copy2(deep_stash_path, original_path)
-                    os.remove(ghost_file_path)
-                    print(f"Restored '{original_path}'")
+        ghost_file_path = f"{file_path}.ds"
+        with open(ghost_file_path, "w") as ghost_file:
+            json.dump({
+                "type": "file",
+                "deep_stash_path": dest,
+                "original_path": file_path,
+                "modified_at": datetime.now().isoformat()
+            }, ghost_file)
 
     def _sort_file(self, file_path):
         extension = os.path.splitext(file_path)[1][1:].lower()
@@ -151,31 +199,15 @@ class DirectoryStash:
             target_folder = self.rules["extensions"][extension]
         elif mime_type in self.rules.get("mime_types", {}):
             target_folder = self.rules["mime_types"][mime_type]
-        else:
-            print(f"No rule exists for '{os.path.basename(file_path)}' (extension: .{extension})")
-            target_folder = input("Enter folder to sort this file into (or press Enter to skip): ").strip()
-            if target_folder:
-                self.rules["extensions"][extension] = target_folder
-                print(f"New rule saved: .{extension} -> {target_folder}")
-            else:
-                print("Skipping file.")
-                return file_path
+
+        if not target_folder:
+            raise ValueError(f"No sorting rule for extension '.{extension}'")
 
         target_dir = os.path.join(self.directory, target_folder)
         os.makedirs(target_dir, exist_ok=True)
         new_path = os.path.join(target_dir, os.path.basename(file_path))
         shutil.move(file_path, new_path)
         return new_path
-
-    def _move_to_deepstash(self, file_path, external_drive):
-        deepstash_dir = os.path.join(external_drive, "deepstash")
-        os.makedirs(deepstash_dir, exist_ok=True)
-        deepstash_path = os.path.join(deepstash_dir, os.path.basename(file_path))
-        shutil.copy2(file_path, deepstash_path)
-        os.remove(file_path)
-        ghost_file_path = f"{file_path}.ds"
-        with open(ghost_file_path, "w") as ghost_file:
-            json.dump({"deep_stash_path": deepstash_path, "original_path": file_path}, ghost_file)
 
     def _load_rules(self):
         return json.load(open(self.rules_file, "r")) if os.path.exists(self.rules_file) else {"extensions": {}, "mime_types": {}}
@@ -188,25 +220,23 @@ class DirectoryStash:
         return json.load(open(self.stash_file, "r")) if os.path.exists(self.stash_file) else {"items": []}
 
     def _save_stash(self):
+        os.makedirs(self.stash_dir, exist_ok=True)
         with open(self.stash_file, "w") as file:
             json.dump(self.stash_data, file, indent=4)
-
 
 def main():
     parser = argparse.ArgumentParser(description="Manage a directory stash.")
     subparsers = parser.add_subparsers(dest="command")
 
     subparsers.add_parser("init", help="Initialize the stash.")
-    subparsers.add_parser("update", help="Update the stash.")
-    subparsers.add_parser("status", help="Show stash status.")
+    update_parser = subparsers.add_parser("update", help="Update the stash.")
+    update_parser.add_argument("--verbose", action="store_true", help="Show detailed update actions.")
 
-    deepstash_parser = subparsers.add_parser("deepstash", help="Force deepstash files.")
-    deepstash_parser.add_argument("files", nargs="+", help="Files to deepstash.")
-
-    restore_parser = subparsers.add_parser("restore", help="Restore deep-stashed files.")
-    restore_parser.add_argument("--timeframe", type=int, help="Restore files within N days.")
-    restore_parser.add_argument("--folder", type=str, help="Restore files from a folder.")
-    restore_parser.add_argument("--file", type=str, help="Restore a specific file.")
+    status_parser = subparsers.add_parser("status", help="Show stash status.")
+    force_parser = subparsers.add_parser("force", help="Force deepstash of a file or folder.")
+    force_parser.add_argument("target", help="The file or folder to force stash.")
+    restore_parser = subparsers.add_parser("restore", help="Restore a specific file or folder from stash.")
+    restore_parser.add_argument("target", help="The name of the .ds file or item to restore.")
 
     args = parser.parse_args()
     stash = DirectoryStash()
@@ -214,16 +244,15 @@ def main():
     if args.command == "init":
         stash.initialize()
     elif args.command == "update":
-        stash.update()
+        stash.update(verbose=args.verbose)
     elif args.command == "status":
         stash.status()
-    elif args.command == "deepstash":
-        stash.force_deepstash(args.files)
+    elif args.command == "force":
+        stash.force(args.target)
     elif args.command == "restore":
-        stash.restore(timeframe=args.timeframe, folder=args.folder, file_to_restore=args.file)
+        stash.restore(args.target)
     else:
         parser.print_help()
-
 
 if __name__ == "__main__":
     main()
