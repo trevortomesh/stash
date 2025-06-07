@@ -11,6 +11,10 @@
 </p>
 
 Stash is a powerful file organization tool that helps you sort, archive, and manage your files efficiently.
+It is the parent project of the _Stash Ecosystem_ that includes:
+- [Stash](https://github.com/trevortomesh/stash)
+- [deepstash](https://github.com/trevortomesh/deep-stash)
+- [StashBox (coming soon)](https://github.com/trevortomesh/stash-box)
 
 ## Features
 
