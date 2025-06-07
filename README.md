@@ -256,8 +256,10 @@ For feedback, questions, or issues, please open an issue on the GitHub repositor
 
 ----
 ## 🧠 Philosophy
+
 Stash began as a conceptual data structure — a digital “box” where users could throw anything with the intention of sorting it later. Inspired by the human habit of stashing files and folders into catch-all directories, this project set out to turn that chaos into structured automation.
 What started as an abstract idea evolved into a real-world command-line tool that helps users organize their filesystem with minimal effort and maximum flexibility.
+
 ----
 ## 🤖 Note
 
