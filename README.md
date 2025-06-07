@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/stash-ico.png" alt="Stash logo" width="300"/>
+  <img src="images/stash-with-text.png" alt="Stash logo" width="300"/>
 </p>
 
 <p align="center">
