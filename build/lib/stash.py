@@ -69,10 +69,11 @@ class DirectoryStash:
 
         for file_path in all_files:
             try:
-                self._sort_file(file_path)
+                result = self._sort_file(file_path)
+                if result and verbose:
+                    print(f"Moved '{file_path}' to '{result}'")
             except Exception as e:
-                if verbose:
-                    print(f"Error sorting file '{file_path}': {e}")
+                print(f"Skipped '{file_path}': {e}")
 
         self._save_stash()
         self._save_rules()
@@ -84,6 +85,8 @@ class DirectoryStash:
 
     def _sort_file(self, file_path):
         extension = os.path.splitext(file_path)[1][1:].lower()
+        if extension in self.rules.get("ignore", []):
+            return  # Skip this file
         mime_type, _ = mimetypes.guess_type(file_path)
         target_folder = None
 
@@ -93,7 +96,12 @@ class DirectoryStash:
             target_folder = self.rules["mime_types"][mime_type]
 
         if not target_folder:
-            raise ValueError(f"No sorting rule for extension '.{extension}'")
+            response = input(f"No rule for '.{extension}'. Where should these files go? [Leave blank to skip]: ").strip()
+            if not response:
+                raise ValueError(f"No sorting rule for extension '.{extension}'")
+            self.rules["extensions"][extension] = response
+            self._save_rules()
+            target_folder = response
 
         target_dir = os.path.join(self.directory, target_folder)
         os.makedirs(target_dir, exist_ok=True)
@@ -121,7 +129,10 @@ def main():
     subparsers = parser.add_subparsers(dest="command")
 
     subparsers.add_parser("init", help="Initialize the stash.")
-    update_parser = subparsers.add_parser("update", help="Update the stash.")
+    update_parser = subparsers.add_parser(
+        "update",
+        help="Update the stash (sorts files in root, prompts for new types, supports 'ignore' list in rules.json)."
+    )
     update_parser.add_argument("--verbose", action="store_true", help="Show detailed update actions.")
 
     status_parser = subparsers.add_parser("status", help="Show stash status.")

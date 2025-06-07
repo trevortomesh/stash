@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: stash-organizer
-Version: 0.1.0
+Version: 0.2.0
 Summary: A lightweight tool to sort and manage directory contents.
 Home-page: https://github.com/yourusername/stash
 Author: Trevor Tomesh
@@ -19,6 +19,20 @@ Dynamic: home-page
 Dynamic: license-file
 Dynamic: requires-python
 Dynamic: summary
+
+<p align="center">
+  <img src="images/stash-with-text.png" alt="Stash logo" width="300"/>
+</p>
+
+<p align="center">
+  <img alt="Python 3.6+" src="https://img.shields.io/badge/Python-3.6+-blue?logo=python&logoColor=white&style=flat-square"/>
+  <img alt="Vibe-Coded" src="https://img.shields.io/badge/Vibe%20Coded-%F0%9F%92%8C-purple?style=flat-square"/>
+  <a href="https://github.com/trevortomesh/fearfully-coded">
+    <img alt="Fearfully Coded" src="https://img.shields.io/badge/🕊️Fearfully%20Coded-blue?style=flat-square"/>
+  </a>
+</p>
+
+----
 
 # ![stash-ico](images/stash-ico.png) <u>Stash</u>
 
@@ -57,21 +71,21 @@ cd stash
 
 Or download the standalone script.
 
-### Step 2: Install Stash Globally
+### Step 2: Install with pip
 
-Run the installation script:
+Install Stash using pip:
 
 ```bash
-chmod +x install.sh
-./install.sh
+pip install stash-organizer
 ```
 
-This will:
+Or, if you cloned the repository locally:
 
-1. Make `stash` executable.
-2. Place it in `/usr/local/bin/` for global use.
+```bash
+pip install .
+```
 
-### Step 3: Verify Installation
+Verify the installation by running:
 
 ```bash
 stash --help
@@ -192,7 +206,17 @@ Rules are saved in `rules.json` within the `.stash` directory:
 }
 ```
 
-Edit this file manually to add or modify rules.
+You can also add an "ignore" list to prevent certain file types from being moved:
+
+```json
+{
+    "ignore": ["log", "tmp"]
+}
+```
+
+These extensions will be skipped during `stash update`.
+
+Additionally, when Stash encounters a file type with no rule defined, it will prompt you interactively to assign a folder name. Press Enter to skip a type without assigning a rule.
 
 ---
 
@@ -254,3 +278,34 @@ This project is licensed under the MIT License.
 ## Support
 
 For feedback, questions, or issues, please open an issue on the GitHub repository.
+
+---
+
+## Related Projects
+
+- **DeepStash** – A sister project to Stash that provides advanced long-term archival and external drive backup for deeply cold files.  
+  [https://github.com/trevortomesh/deep-stash](https://github.com/trevortomesh/deep-stash)
+
+----
+## 🧠 Philosophy
+
+Stash began as a conceptual data structure — a digital “box” where users could throw anything with the intention of sorting it later. Inspired by the human habit of stashing files and folders into catch-all directories, this project set out to turn that chaos into structured automation.
+What started as an abstract idea evolved into a real-world command-line tool that helps users organize their filesystem with minimal effort and maximum flexibility.
+
+----
+## 🤖 Note
+
+This tool was created using **vibe coding** — describing what I wanted to an AI assistant, refining the results through iteration. No detailed plan — just intuition, adaptation, and execution.
+
+----
+## 🕊️ Dedication
+
+This project is dedicated to the Lord.
+
+All logic, structure, and order — including the very foundations of programming — reflect the perfection of His design. May this tool, in its small way, point toward the beauty and coherence He has written into the fabric of creation.
+
+> **"I praise you, for I am fearfully and wonderfully made.  
+> Wonderful are your works; my soul knows it very well."**  
+> — Psalm 139:14
+
+**Soli Deo Gloria.**

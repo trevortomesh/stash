@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='stash-organizer',
-    version='0.1.0',
+    version='0.2.0',
     py_modules=['stash'],
     entry_points={
         'console_scripts': [
