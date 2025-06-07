@@ -5,7 +5,7 @@
 <p align="center">
   <img alt="Python 3.6+" src="https://img.shields.io/badge/Python-3.6+-blue?logo=python&logoColor=white&style=flat-square"/>
   <img alt="Vibe-Coded" src="https://img.shields.io/badge/Vibe%20Coded-%F0%9F%92%8C-purple?style=flat-square"/>
-  <a href="#-dedication">
+  <a href="https://github.com/trevortomesh/fearfully-coded">
     <img alt="Fearfully Coded" src="https://img.shields.io/badge/🕊️Fearfully%20Coded-blue?style=flat-square"/>
   </a>
 </p>
@@ -256,7 +256,8 @@ For feedback, questions, or issues, please open an issue on the GitHub repositor
 
 ----
 ## 🧠 Philosophy
-
+Stash began as a conceptual data structure — a digital “box” where users could throw anything with the intention of sorting it later. Inspired by the human habit of stashing files and folders into catch-all directories, this project set out to turn that chaos into structured automation.
+What started as an abstract idea evolved into a real-world command-line tool that helps users organize their filesystem with minimal effort and maximum flexibility.
 ----
 ## 🤖 Note
 
