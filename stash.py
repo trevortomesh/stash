@@ -79,10 +79,6 @@ class DirectoryStash:
         self._save_rules()
         print("Update complete.")
 
-    def status(self):
-        print("Stash status:")
-        print(json.dumps(self.stash_data, indent=4))
-
     def _sort_file(self, file_path):
         extension = os.path.splitext(file_path)[1][1:].lower()
         if extension in self.rules.get("ignore", []):
@@ -135,8 +131,6 @@ def main():
     )
     update_parser.add_argument("--verbose", action="store_true", help="Show detailed update actions.")
 
-    status_parser = subparsers.add_parser("status", help="Show stash status.")
-
     args = parser.parse_args()
     stash = DirectoryStash()
 
@@ -144,8 +138,6 @@ def main():
         stash.initialize()
     elif args.command == "update":
         stash.update(verbose=args.verbose)
-    elif args.command == "status":
-        stash.status()
     else:
         parser.print_help()
 

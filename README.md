@@ -29,9 +29,6 @@ Stash is a powerful file organization tool that helps you sort, archive, and man
 - **Capitalized Folder Targets**  
   By convention, folders like `Images`, `Videos`, or `Docs` are used as sorting targets, keeping your directory clean and readable.
 
-- **Status Overview**  
-  The `stash status` command shows how many files have been sorted and how many remain, providing a quick snapshot of progress.
-
 - **Portable & Minimal Dependencies**  
   Runs as a standalone Python script without requiring a full framework or complex setup.
 
@@ -97,19 +94,25 @@ stash --help
 
 ## Configuration
 
-Stash can be configured via a config file located at `~/.stash/config.yaml`. Example configuration:
+Stash uses a `rules.json` file inside each `.stash` directory to determine how files are sorted. Example:
 
-```yaml
-sort_rules:
-  - extension: .txt
-    destination: TextFiles/
-  - extension: .jpg
-    destination: Images/
+```json
+{
+    "extensions": {
+        "txt": "Docs",
+        "ics": "Docs",
+        "png": "Images",
+        "ds": "Deep",
+        "jpeg": "Images",
+        "excalidraw": "Docs"
+    },
+    "mime_types": {}
+}
 ```
 
 ## Tips
 
-- Use `stash status` to review what files have been sorted and what remains in the stash directory.
+- Periodically check your sorted folders to ensure files are going to the expected locations.
 - Combine with DeepStash for cold storage management.
 
 ## Uninstallation
@@ -134,7 +137,7 @@ For support, open an issue on GitHub or contact the maintainer.
 
 ## Related Projects
 
-- **DeepStash** – A sister project to Stash that provides advanced long-term archival and external drive backup for deeply cold files.  
+- **DeepStASH** – A sister project to Stash that provides advanced long-term archival and external drive backup for deeply cold files.  
   [https://github.com/trevortomesh/deep-stash](https://github.com/trevortomesh/deep-stash)
 
   ### 🧊 Suggested Use:
