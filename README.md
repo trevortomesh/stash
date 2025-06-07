@@ -1,3 +1,17 @@
+<p align="center">
+  <img src="images/stash-ico.png" alt="Stash logo" width="300"/>
+</p>
+
+<p align="center">
+  <img alt="Python 3.6+" src="https://img.shields.io/badge/Python-3.6+-blue?logo=python&logoColor=white&style=flat-square"/>
+  <img alt="Vibe-Coded" src="https://img.shields.io/badge/Vibe%20Coded-%F0%9F%92%8C-purple?style=flat-square"/>
+  <a href="#-dedication">
+    <img alt="Fearfully Coded" src="https://img.shields.io/badge/🕊️Fearfully%20Coded-blue?style=flat-square"/>
+  </a>
+</p>
+
+----
+
 # ![stash-ico](images/stash-ico.png) <u>Stash</u>
 
 **Stash** is a lightweight, powerful Python-based directory management tool. It allows you to sort and organize files with ease.
@@ -239,3 +253,24 @@ For feedback, questions, or issues, please open an issue on the GitHub repositor
 
 - **DeepStash** – A sister project to Stash that provides advanced long-term archival and external drive backup for deeply cold files.  
   [https://github.com/trevortomesh/deep-stash](https://github.com/trevortomesh/deep-stash)
+
+----
+## 🧠 Philosophy
+
+----
+## 🤖 Note
+
+This tool was created using **vibe coding** — describing what I wanted to an AI assistant, refining the results through iteration. No detailed plan — just intuition, adaptation, and execution.
+
+----
+## 🕊️ Dedication
+
+This project is dedicated to the Lord.
+
+All logic, structure, and order — including the very foundations of programming — reflect the perfection of His design. May this tool, in its small way, point toward the beauty and coherence He has written into the fabric of creation.
+
+> **"I praise you, for I am fearfully and wonderfully made.  
+> Wonderful are your works; my soul knows it very well."**  
+> — Psalm 139:14
+
+**Soli Deo Gloria.**
